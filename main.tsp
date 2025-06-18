@@ -26,6 +26,25 @@ enum petType {
     reptile: "reptile",
 }
 
+@error
+model NotFoundError {
+    code: "NOT_FOUND";
+    message: string;
+}
+
+@error
+model ValidationError {
+    code: "VALIDATION_ERROR";
+    message: string;
+    details: string[];
+}
+
+@error
+model InternalServerError {
+    code: "INTERNAL_SERVER_ERROR";
+    message: string;
+}
+
 @route("/pets")
 namespace Pets {
     @get
@@ -40,22 +59,46 @@ namespace Pets {
         @body pet: Pet;
     } | {
         @statusCode statusCode: 404;
+        @body error: NotFoundError;
     };
 
     @post
-    op createPet(@body pet: Pet): {
-        @statusCode statusCode: 201;
-        @body newPet: Pet;
-    } | {
-        @statusCode statusCode: 202;
-        @body acceptedPet: Pet;
-    };
+    op createPet(@body pet: Pet):
+        | {
+              @statusCode statusCode: 201;
+              @body newPet: Pet;
+          }
+        | {
+              @statusCode statusCode: 202;
+              @body acceptedPet: Pet;
+          }
+        | {
+              @statusCode statusCode: 400;
+              @body error: ValidationError;
+          }
+        | {
+              @statusCode statusCode: 500;
+              @body error: InternalServerError;
+          };
 
     @put
-    op updatePet(@path petId: int32, @body pet: Pet): {
-        @statusCode statusCode: 200;
-        @body pet: Pet;
-    };
+    op updatePet(@path petId: int32, @body pet: Pet):
+        | {
+              @statusCode statusCode: 200;
+              @body pet: Pet;
+          }
+        | {
+              @statusCode statusCode: 404;
+              @body error: NotFoundError;
+          }
+        | {
+              @statusCode statusCode: 400;
+              @body error: ValidationError;
+          }
+        | {
+              @statusCode statusCode: 500;
+              @body error: InternalServerError;
+          };
 
     @delete
     op deletePet(@path petId: int32): {
