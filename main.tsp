@@ -38,12 +38,17 @@ namespace Pets {
     op getPet(@path petId: int32): {
         @statusCode statusCode: 200;
         @body pet: Pet;
+    } | {
+        @statusCode statusCode: 404;
     };
 
     @post
     op createPet(@body pet: Pet): {
         @statusCode statusCode: 201;
-        @body pet: Pet;
+        @body newPet: Pet;
+    } | {
+        @statusCode statusCode: 202;
+        @body acceptedPet: Pet;
     };
 
     @put
