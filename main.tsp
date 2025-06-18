@@ -25,3 +25,35 @@ enum petType {
     bird: "bird",
     reptile: "reptile",
 }
+
+@route("/pets")
+namespace Pets {
+    @get
+    op listPets(): {
+        @statusCode statusCode: 200;
+        @body pets: Pet[];
+    };
+
+    @get
+    op getPet(@path petId: int32): {
+        @statusCode statusCode: 200;
+        @body pet: Pet;
+    };
+
+    @post
+    op createPet(@body pet: Pet): {
+        @statusCode statusCode: 201;
+        @body pet: Pet;
+    };
+
+    @put
+    op updatePet(@path petId: int32, @body pet: Pet): {
+        @statusCode statusCode: 200;
+        @body pet: Pet;
+    };
+
+    @delete
+    op deletePet(@path petId: int32): {
+        @statusCode statusCode: 204;
+    };
+}
