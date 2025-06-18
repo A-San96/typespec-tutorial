@@ -45,16 +45,27 @@ model InternalServerError {
     message: string;
 }
 
+model CommonParameters {
+    @header
+    requestId: string;
+
+    @query
+    locale?: string;
+
+    @header
+    clientVersion?: string;
+}
+
 @route("/pets")
 namespace Pets {
     @get
-    op listPets(): {
+    op listPets(...CommonParameters): {
         @statusCode statusCode: 200;
         @body pets: Pet[];
     };
 
     @get
-    op getPet(@path petId: int32): {
+    op getPet(@path petId: int32, ...CommonParameters): {
         @statusCode statusCode: 200;
         @body pet: Pet;
     } | {
@@ -63,7 +74,7 @@ namespace Pets {
     };
 
     @post
-    op createPet(@body pet: Pet):
+    op createPet(@body pet: Pet, ...CommonParameters):
         | {
               @statusCode statusCode: 201;
               @body newPet: Pet;
@@ -82,7 +93,7 @@ namespace Pets {
           };
 
     @put
-    op updatePet(@path petId: int32, @body pet: Pet):
+    op updatePet(@path petId: int32, @body pet: Pet, ...CommonParameters):
         | {
               @statusCode statusCode: 200;
               @body pet: Pet;
@@ -101,7 +112,7 @@ namespace Pets {
           };
 
     @delete
-    op deletePet(@path petId: int32): {
+    op deletePet(@path petId: int32, ...CommonParameters): {
         @statusCode statusCode: 204;
     };
 }
