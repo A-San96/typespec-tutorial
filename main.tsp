@@ -45,6 +45,12 @@ model InternalServerError {
     message: string;
 }
 
+@error
+model UnauthorizedError {
+    code: "UNAUTHORIZED";
+    message: string;
+}
+
 model CommonParameters {
     @header
     requestId: string;
@@ -73,6 +79,7 @@ namespace Pets {
         @body error: NotFoundError;
     };
 
+    @useAuth(BearerAuth)
     @post
     op createPet(@body pet: Pet, ...CommonParameters):
         | {
@@ -88,10 +95,15 @@ namespace Pets {
               @body error: ValidationError;
           }
         | {
+              @statusCode statusCode: 401;
+              @body error: UnauthorizedError;
+          }
+        | {
               @statusCode statusCode: 500;
               @body error: InternalServerError;
           };
 
+    @useAuth(BearerAuth)
     @put
     op updatePet(@path petId: int32, @body pet: Pet, ...CommonParameters):
         | {
@@ -107,12 +119,23 @@ namespace Pets {
               @body error: ValidationError;
           }
         | {
+              @statusCode statusCode: 401;
+              @body error: UnauthorizedError;
+          }
+        | {
               @statusCode statusCode: 500;
               @body error: InternalServerError;
           };
 
+    @useAuth(BearerAuth)
     @delete
     op deletePet(@path petId: int32, ...CommonParameters): {
         @statusCode statusCode: 204;
+    } | {
+        @statusCode statusCode: 404;
+        @body error: NotFoundError;
+    } | {
+        @statusCode statusCode: 400;
+        @body error: UnauthorizedError;
     };
 }
