@@ -1,5 +1,8 @@
 import "@typespec/http";
 import "@typespec/versioning";
+import "./petstore/models.tsp";
+import "./petstore/errors.tsp";
+import "./petstore/responses.tsp";
 
 using Http;
 using Versioning;
@@ -9,117 +12,6 @@ using Versioning;
 @versioned(Versions)
 namespace PetStore;
 
-enum Versions {
-  v1: "1.0.0",
-  v2: "2.0.0",
-}
-
-@added(Versions.v2)
-model Toy {
-  id: int32;
-  name: string;
-}
-
-model Pet {
-  id: int32;
-
-  @minLength(2)
-  name: string;
-
-  @minValue(0)
-  @maxValue(100)
-  age: int32;
-
-  kind: petType;
-}
-
-enum petType {
-  dog: "dog",
-  cat: "cat",
-  fish: "fish",
-  bird: "bird",
-  reptile: "reptile",
-}
-
-@error
-model NotFoundError {
-  code: "NOT_FOUND";
-  message: string;
-}
-
-@error
-model ValidationError {
-  code: "VALIDATION_ERROR";
-  message: string;
-  details: string[];
-}
-
-@error
-model InternalServerError {
-  code: "INTERNAL_SERVER_ERROR";
-  message: string;
-}
-
-@error
-model UnauthorizedError {
-  code: "UNAUTHORIZED";
-  message: string;
-}
-
-model CommonParameters {
-  @header
-  requestId: string;
-
-  @query
-  locale?: string;
-
-  @header
-  clientVersion?: string;
-}
-
-model PetListResponse {
-  ...OkResponse;
-  ...Body<Pet[]>;
-}
-
-model PetResponse {
-  ...OkResponse;
-  ...Body<Pet>;
-}
-
-model PetCreatedResponse {
-  ...CreatedResponse;
-  ...Body<Pet>;
-}
-
-model PetErrorResponse {
-  ...BadRequestResponse;
-  ...Body<ValidationError>;
-}
-
-model PetNotFoundResponse {
-  ...NotFoundResponse;
-  ...Body<NotFoundError>;
-}
-
-model PetUnauthorizedResponse {
-  ...UnauthorizedResponse;
-  ...Body<UnauthorizedError>;
-}
-
-model PetSuccessResponse {
-  ...OkResponse;
-  ...Body<Pet>;
-}
-
-model PetNoContentResponse {
-  ...NoContentResponse;
-}
-
-model InternalServerErrorResponse {
-  @statusCode statusCode: 500;
-  ...Body<InternalServerError>;
-}
 @route("/pets")
 namespace Pets {
   @get
